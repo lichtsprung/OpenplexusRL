@@ -21,23 +21,11 @@ class Game extends BasicGame("street") {
   }
 
   override def update(gc: GameContainer, delta: Int) {
-    val input = gc.getInput
-    if (input.isKeyPressed(Input.KEY_UP)){
-     world.playerMoveUp()
-    }else if (input.isKeyPressed(Input.KEY_DOWN)){
-      world.playerMoveDown()
-    }else if (input.isKeyPressed(Input.KEY_LEFT)){
-      world.playerMoveLeft()
-    }else if (input.isKeyPressed(Input.KEY_RIGHT)){
-      world.playerMoveRight()
-    }
-    world.update()
   }
 
   override def render(gc: GameContainer, g: Graphics) {
     g.setColor(Color.black)
     g.fillRect(0, 0, gc.getWidth, gc.getHeight)
     g.setColor(Color.green)
-    world.draw(g)
   }
 }
