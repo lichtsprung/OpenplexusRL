@@ -14,6 +14,10 @@ class World() {
 
 }
 
+/**
+ * A hexagonal cell of the map.
+ * @param id the id of this cell
+ */
 case class Cell(val id: Int) {
   var cellType: String = ""
 
@@ -31,6 +35,10 @@ case class Cell(val id: Int) {
   var visible: Boolean = false
   var marked: Boolean = false
 
+  /**
+   * Registers a neighbor east of this cell
+   * @param neighbor the neighbor cell
+   */
   def registerNeighborEast(neighbor: Cell) = {
     if (neighbor != null) {
       east = neighbor
@@ -94,16 +102,32 @@ case class Cell(val id: Int) {
   }
 
 
+  /**
+   * Registers an entity with this cell.
+   * @param entity the new entity
+   * @return a list of all entities on this cell
+   */
   def registerEntity(entity: Entity) = entities += entity
 
+  /**
+   * Removes an entity from this cell
+   * @param entity the entity to be removed
+   * @return a list of all entities on this cell
+   */
   def unregisterEntity(entity: Entity) = entities -= entity
 
   def draw(g: Graphics, sprites: SpriteManager) = {
 
   }
 
+  override def toString = String.valueOf(id)
+
 }
 
+/**
+ * The world map.
+ * @param player the player
+ */
 case class WorldMap(val player: Player) {
   private val idGenerator = new IDGenerator()
   private val seedCell = Cell(idGenerator.nextID())
@@ -111,7 +135,12 @@ case class WorldMap(val player: Player) {
   player.setPosition(seedCell)
 
 
-  def init(width: Int, height: Int) = {
+  /**
+   * Initializes the map.
+   * @param width the starting width of the map
+   * @param height the starting height of the map
+   */
+  def init(width: Int = 5, height: Int = 5) = {
     var top = seedCell
 
     // Oberste Zeile der Map erzeugen.
@@ -131,13 +160,6 @@ case class WorldMap(val player: Player) {
         val topEast = top.east
         val bottomEast = Cell(idGenerator.nextID())
 
-        println("top", top)
-        println("bottom", bottom)
-        println("topEast", topEast)
-        println("bottomEast", bottomEast)
-        println
-
-
         top.registerNeighborSoutheast(bottomEast)
         top.registerNeighborSouth(bottom)
 
@@ -148,20 +170,62 @@ case class WorldMap(val player: Player) {
         bottom = bottomEast
 
       }
-
-      println("------------------------------------------")
       top = nextTop
       bottom = Cell(idGenerator.nextID())
       nextTop = bottom
     }
   }
 
-  def traversMap(): Unit = traversMap(seedCell)
+  /**
+   * Traverses the underlying graph and prints some information about the cells
+   */
+  def traversMap(): Unit = {
+    visit(seedCell)
+    resetMarkers()
+  }
+  def resetMarkers(): Unit = reset(seedCell)
 
-  private def traversMap(cell: Cell): Unit = {
-    if (cell != null) {
-      println("Cell {} is connected to ", cell.id)
+  private def reset(cell: Cell) = {
+    if (cell != null && cell.marked) {
+      cell.marked = false
+      visit(cell.north)
+      visit(cell.northwest)
+      visit(cell.west)
+      visit(cell.southwest)
+      visit(cell.south)
+      visit(cell.southeast)
+      visit(cell.east)
+      visit(cell.northeast)
     }
+  }
+
+  private def visit(cell: Cell): Unit = {
+    if (cell != null && !cell.marked) {
+//      printf("Cell %s is connected to \n", cell)
+//      printf("\tNorth: Cell %s\n", cell.north)
+//      printf("\tNorthwest: Cell %s\n", cell.northwest)
+//      printf("\tWest: Cell %s\n", cell.west)
+//      printf("\tSouthwest: Cell %s\n", cell.southwest)
+//      printf("\tSouth: Cell %s\n", cell.south)
+//      printf("\tSoutheast: Cell %s\n", cell.southeast)
+//      printf("\tEast: Cell %s\n", cell.east)
+//      printf("\tNortheast: Cell %s\n", cell.northeast)
+      cell.marked = true
+      visit(cell.north)
+      visit(cell.northwest)
+      visit(cell.west)
+      visit(cell.southwest)
+      visit(cell.south)
+      visit(cell.southeast)
+      visit(cell.east)
+      visit(cell.northeast)
+    }
+  }
+
+
+
+  def draw(g: Graphics) = {
+
   }
 
 
