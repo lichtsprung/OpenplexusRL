@@ -29,6 +29,7 @@ trait Movable{
     oldCell
   }
 
+
   def getPosition = currentCell
 
 }

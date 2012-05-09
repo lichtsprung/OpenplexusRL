@@ -1,2 +1,4 @@
 + welt besteht aus zellen und zellen zeichnen sich und ihren inhalt selbst.
 + sichtbarer bereich mit player soll automatisch zentriert werden
++ map history bestimmt, was ein spieler sieht. spieler kann nach n zellen die letzten vergessen.
++ tiles für map sollten größer sein (32 or 64 pixels)

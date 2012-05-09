@@ -12,6 +12,10 @@ class World() {
   val player = Player()
   val map = WorldMap(player)
 
+  def movePlayerNorth() = {
+    map.movePlayerNorth
+  }
+
 }
 
 /**
@@ -228,7 +232,19 @@ case class WorldMap(val player: Player) {
 
   }
 
+  def movePlayerNorth() = {
+    if (player.getPosition.north != null){
+      player.setPosition(player.getPosition.north)
+    }
+  }
 
+  def movePlayerSouth() = {
+    if (player.getPosition.south != null){
+      player.setPosition(player.getPosition.south)
+    }
+  }
+
+  // TODO fertigstellen
 }
 
 private class IDGenerator {
