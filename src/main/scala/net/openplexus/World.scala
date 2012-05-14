@@ -12,8 +12,8 @@ class World() {
   val player = Player()
   val map = WorldMap(player)
 
-  def movePlayerNorth() = {
-    map.movePlayerNorth
+  def draw(g: Graphics) {
+    map.draw(g)
   }
 
 }
@@ -33,6 +33,8 @@ case class Cell(val id: Int) {
   var south: Cell = null
   var southwest: Cell = null
   var southeast: Cell = null
+
+
 
   private val entities = Buffer[Entity]()
   var visited: Boolean = false
@@ -120,7 +122,7 @@ case class Cell(val id: Int) {
    */
   def unregisterEntity(entity: Entity) = entities -= entity
 
-  def draw(g: Graphics, sprites: SpriteManager) = {
+  def draw(g: Graphics) = {
 
   }
 
@@ -135,6 +137,10 @@ case class Cell(val id: Int) {
 case class WorldMap(val player: Player) {
   private val idGenerator = new IDGenerator()
   private val seedCell = Cell(idGenerator.nextID())
+  private var mark = false
+
+  init()
+  resetMarkers()
 
   player.setPosition(seedCell)
 
@@ -187,33 +193,34 @@ case class WorldMap(val player: Player) {
     visit(seedCell)
     resetMarkers()
   }
+
   def resetMarkers(): Unit = reset(seedCell)
 
-  private def reset(cell: Cell) = {
+  private def reset(cell: Cell):Unit = {
     if (cell != null && cell.marked) {
       cell.marked = false
-      visit(cell.north)
-      visit(cell.northwest)
-      visit(cell.west)
-      visit(cell.southwest)
-      visit(cell.south)
-      visit(cell.southeast)
-      visit(cell.east)
-      visit(cell.northeast)
+      reset(cell.north)
+      reset(cell.northwest)
+      reset(cell.west)
+      reset(cell.southwest)
+      reset(cell.south)
+      reset(cell.southeast)
+      reset(cell.east)
+      reset(cell.northeast)
     }
   }
 
   private def visit(cell: Cell): Unit = {
     if (cell != null && !cell.marked) {
-//      printf("Cell %s is connected to \n", cell)
-//      printf("\tNorth: Cell %s\n", cell.north)
-//      printf("\tNorthwest: Cell %s\n", cell.northwest)
-//      printf("\tWest: Cell %s\n", cell.west)
-//      printf("\tSouthwest: Cell %s\n", cell.southwest)
-//      printf("\tSouth: Cell %s\n", cell.south)
-//      printf("\tSoutheast: Cell %s\n", cell.southeast)
-//      printf("\tEast: Cell %s\n", cell.east)
-//      printf("\tNortheast: Cell %s\n", cell.northeast)
+      //      printf("Cell %s is connected to \n", cell)
+      //      printf("\tNorth: Cell %s\n", cell.north)
+      //      printf("\tNorthwest: Cell %s\n", cell.northwest)
+      //      printf("\tWest: Cell %s\n", cell.west)
+      //      printf("\tSouthwest: Cell %s\n", cell.southwest)
+      //      printf("\tSouth: Cell %s\n", cell.south)
+      //      printf("\tSoutheast: Cell %s\n", cell.southeast)
+      //      printf("\tEast: Cell %s\n", cell.east)
+      //      printf("\tNortheast: Cell %s\n", cell.northeast)
       cell.marked = true
       visit(cell.north)
       visit(cell.northwest)
@@ -227,19 +234,36 @@ case class WorldMap(val player: Player) {
   }
 
 
-
   def draw(g: Graphics) = {
+    drawCell(seedCell, 0, 0)
+    mark = !mark
+  }
 
+  private def drawCell(cell: Cell, indexX: Int, indexY: Int): Unit = {
+    if (cell != null && mark == cell.marked) {
+      Game.sprites.getEmptyCell().draw(indexX * Game.sprites.getSpriteWidth(), indexY * Game.sprites.getSpriteHeight())
+      cell.marked = true
+      drawCell(cell.north, indexX, indexY - 1)
+      drawCell(cell.northwest, indexX - 1, indexY - 1)
+      drawCell(cell.west, indexX - 1, indexY)
+      drawCell(cell.southwest, indexX - 1, indexY + 1)
+      drawCell(cell.south, indexX, indexY + 1)
+      drawCell(cell.southeast, indexX + 1, indexY + 1)
+      drawCell(cell.east, indexX + 1, indexY)
+      drawCell(cell.northeast, indexX + 1, indexY + 1)
+    } else {
+      Game.sprites.getBlockedCell().draw(indexX * Game.sprites.getSpriteWidth(), indexY * Game.sprites.getSpriteHeight())
+    }
   }
 
   def movePlayerNorth() = {
-    if (player.getPosition.north != null){
+    if (player.getPosition.north != null) {
       player.setPosition(player.getPosition.north)
     }
   }
 
   def movePlayerSouth() = {
-    if (player.getPosition.south != null){
+    if (player.getPosition.south != null) {
       player.setPosition(player.getPosition.south)
     }
   }
