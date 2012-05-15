@@ -116,22 +116,22 @@ case class WorldMap(val player: Player) {
 
   def createUnevenRow(cell: Cell, width: Int) = {
 
+    var currentBottom = Cell(idGenerator.nextID())
+        val first = currentBottom
+        for (i <- 1 to width) {
+          currentBottom.registerNeighborEast(Cell(idGenerator.nextID()))
+          currentBottom = currentBottom.east
+        }
 
-    //    val first = currentBottom
-    //    for (i <- 1 to width) {
-    //      currentBottom.registerNeighborEast(Cell(idGenerator.nextID()))
-    //      currentBottom = currentBottom.east
-    //    }
-    //
-    //    currentBottom = first
-    //    var currentTop = cell
-    //    while (currentTop.east != null && currentBottom != null) {
-    //      currentTop.registerNeighborSoutheast(currentBottom)
-    //      currentTop.east.registerNeighborSouthwest(currentBottom)
-    //      currentBottom = currentBottom.east
-    //      currentTop = currentTop.east
-    //    }
-    //    currentTop.registerNeighborSoutheast(currentBottom)
+        currentBottom = first
+        var currentTop = cell
+        while (currentTop.east != null && currentBottom != null) {
+          currentTop.registerNeighborSoutheast(currentBottom)
+          currentTop.east.registerNeighborSouthwest(currentBottom)
+          currentBottom = currentBottom.east
+          currentTop = currentTop.east
+        }
+        currentTop.registerNeighborSoutheast(currentBottom)
   }
 
   /**
@@ -149,10 +149,8 @@ case class WorldMap(val player: Player) {
 
     current = seedCell
 
-    val currentBottom = Cell(idGenerator.nextID())
-    current.registerNeighborSoutheast(currentBottom)
-    current.east.registerNeighborSouthwest(currentBottom)
-    //createUnevenRow(current, width)
+
+    createUnevenRow(current, width)
 
     //        for (i<- 1 to height){
     //          if (i % 2 == 0){
@@ -196,24 +194,18 @@ case class WorldMap(val player: Player) {
       drawDiagonalCell(cell.northeast, x + 1, y - 1)
       drawCell(cell.east, x + 1, y)
       drawDiagonalCell(cell.southeast, x + 1, y + 1)
-      drawDiagonalCell(cell.southwest, x - 1, y + 1)
-      drawCell(cell.west, x - 1, y)
-      drawDiagonalCell(cell.northwest, x - 1, y - 1)
     }
   }
 
   def drawDiagonalCell(cell: Cell, x: Int, y: Int): Unit = {
     if (cell != null && cell.marked != mark) {
-      val width = x * (Game.sprites.getSpriteWidth() + (Game.sprites.getSpriteWidth() / 2)).toFloat
+      val width = -(Game.sprites.getSpriteWidth()) + (Game.sprites.getSpriteWidth() / 2) + x * (Game.sprites.getSpriteWidth()).toFloat
       val height = y * (Game.sprites.getSpriteHeight() - 8).toFloat
       Game.sprites.getEmptyCell().draw(width, height)
       cell.marked = !cell.marked
       drawDiagonalCell(cell.northeast, x + 1, y - 1)
       drawCell(cell.east, x + 1, y)
       drawDiagonalCell(cell.southeast, x + 1, y + 1)
-      drawDiagonalCell(cell.southwest, x - 1, y + 1)
-      drawCell(cell.west, x - 1, y)
-      drawDiagonalCell(cell.northwest, x - 1, y - 1)
     }
   }
 
