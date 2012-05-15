@@ -125,32 +125,42 @@ case class WorldMap(val player: Player) {
    */
   def init(width: Int = 5, height: Int = 5) = {
     // create top row
-//    var current = seedCell
-//    for (i <- 1 to width) {
-//      current.registerNeighborEast(Cell(idGenerator.nextID()))
-//      current = current.east
-//    }
+        var current = seedCell
+        for (i <- 1 to width) {
+          current.registerNeighborEast(Cell(idGenerator.nextID()))
+          current = current.east
+        }
+
+        current = seedCell
+        createUnevenRow(current, width)
+
+//        for (i<- 1 to height){
+//          if (i % 2 == 0){
+//            createEvenRow(current, width)
+//          }else{
+//            createUnevenRow(current, width)
+//          }
+//        }
+
+
+
+
+//    seedCell.registerNeighborNortheast(Cell(idGenerator.nextID()))
+//    seedCell.northeast.registerNeighborNortheast(Cell(idGenerator.nextID()))
 //
-//    current = seedCell
-//    createUnevenRow(current, width)
-
-    //    for (i<- 1 to height){
-    //      if (i % 2 == 0){
-    //        createEvenRow(current)
-    //      }else{
-    //        createUnevenRow(current)
-    //      }
-    //    }
-
-
-
-
-    seedCell.registerNeighborNortheast(Cell(idGenerator.nextID()))
-//    seedCell.registerNeighborEast(Cell(idGenerator.nextID()))
-//    seedCell.registerNeighborSoutheast(Cell(idGenerator.nextID()))
-//    seedCell.registerNeighborSouthwest(Cell(idGenerator.nextID()))
-//    seedCell.registerNeighborWest(Cell(idGenerator.nextID()))
 //    seedCell.registerNeighborNorthwest(Cell(idGenerator.nextID()))
+//    seedCell.northwest.registerNeighborNorthwest(Cell(idGenerator.nextID()))
+//
+//    seedCell.registerNeighborSouthwest(Cell(idGenerator.nextID()))
+//    seedCell.southwest.registerNeighborSouthwest(Cell(idGenerator.nextID()))
+//
+//    seedCell.registerNeighborSoutheast(Cell(idGenerator.nextID()))
+//    seedCell.southeast.registerNeighborSoutheast(Cell(idGenerator.nextID()))
+    //    seedCell.registerNeighborEast(Cell(idGenerator.nextID()))
+    //    seedCell.registerNeighborSoutheast(Cell(idGenerator.nextID()))
+    //    seedCell.registerNeighborSouthwest(Cell(idGenerator.nextID()))
+    //    seedCell.registerNeighborWest(Cell(idGenerator.nextID()))
+    //    seedCell.registerNeighborNorthwest(Cell(idGenerator.nextID()))
   }
 
 
@@ -176,7 +186,7 @@ case class WorldMap(val player: Player) {
 
   def drawDiagonalCell(cell: Cell, x: Int, y: Int): Unit = {
     if (cell != null && cell.marked != mark) {
-      val width = x * Game.sprites.getSpriteWidth() - (Game.sprites.getSpriteWidth() / 2).toFloat
+      val width = x * (Game.sprites.getSpriteWidth() - (Game.sprites.getSpriteWidth() / 2)).toFloat
       val height = y * (Game.sprites.getSpriteHeight() - 8).toFloat
       Game.sprites.getEmptyCell().draw(width, height)
       cell.marked = !cell.marked
