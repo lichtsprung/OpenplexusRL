@@ -8,4 +8,5 @@ organization := "net.openplexus"
 
 libraryDependencies += "org.scalatest" %% "scalatest" % "1.7.2" % "test"
 
+seq(lwjglSettings: _*)
 
