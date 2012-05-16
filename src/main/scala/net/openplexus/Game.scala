@@ -22,7 +22,7 @@ class Game extends BasicGame("street") {
 
   override def init(gc: GameContainer) {
     sprites = new SpriteManager()
-    world = new World
+    world = new World(gc.getWidth / sprites.getSpriteWidth(), gc.getHeight / sprites.getSpriteHeight())
     println("Initialized Game")
   }
 
@@ -32,7 +32,7 @@ class Game extends BasicGame("street") {
   override def render(gc: GameContainer, g: Graphics) {
     g.setColor(Color.black)
     g.fillRect(0, 0, gc.getWidth, gc.getHeight)
-    g.translate(gc.getWidth / 2, gc.getHeight / 2)
+    //g.translate(gc.getWidth / 2, gc.getHeight / 2)
     world.draw(g)
   }
 }

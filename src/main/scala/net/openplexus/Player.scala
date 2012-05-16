@@ -1,5 +1,7 @@
 package net.openplexus
 
+import org.newdawn.slick.Graphics
+
 
 /**
  *
@@ -8,7 +10,11 @@ package net.openplexus
  */
 
 case class Player() extends Entity with Movable{
+  private val sprite = Game.sprites.getPlayerSprite()
 
+  def draw(g: Graphics, x: Float, y: Float) {
+    sprite.draw(x, y)
+  }
 }
 
 /**
@@ -34,4 +40,6 @@ trait Movable{
 
 }
 
-abstract class Entity
+abstract class Entity{
+  abstract def draw(g: Graphics, x: Float, y: Float)
+}

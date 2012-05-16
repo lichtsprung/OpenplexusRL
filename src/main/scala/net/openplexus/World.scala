@@ -7,9 +7,9 @@ import org.newdawn.slick.Graphics
  * World related stuff.
  */
 
-class World() {
+class World(val width: Int, val height: Int) {
   val player = Player()
-  val map = WorldMap(player)
+  val map = WorldMap(player, width, height)
 
   def draw(g: Graphics) {
     map.draw(g)
@@ -99,39 +99,58 @@ case class Cell(val id: Int) {
  * The world map.
  * @param player the player
  */
-case class WorldMap(val player: Player) {
+case class WorldMap(val player: Player, var width: Int, var height: Int) {
   private val idGenerator = new IDGenerator()
   private val seedCell = Cell(idGenerator.nextID())
   private var mark = true
 
-  init()
+  init(width, height)
 
 
   player.setPosition(seedCell)
 
 
-  def createEvenRow(cell: Cell, width: Int): Unit = {
+  private def createEvenRow(cell: Cell, width: Int) = {
+    var currentBottom = Cell(idGenerator.nextID())
+    val first = currentBottom
+    for (i <- 1 to width) {
+      currentBottom.registerNeighborEast(Cell(idGenerator.nextID()))
+      currentBottom = currentBottom.east
+    }
 
+    currentBottom = first
+    var currentTop = cell
+    currentTop.registerNeighborSouthwest(currentBottom)
+    currentBottom = currentBottom.east
+
+    while (currentTop.east != null && currentBottom != null) {
+      currentTop.registerNeighborSoutheast(currentBottom)
+      currentTop.east.registerNeighborSouthwest(currentBottom)
+      currentBottom = currentBottom.east
+      currentTop = currentTop.east
+    }
+    first
   }
 
-  def createUnevenRow(cell: Cell, width: Int) = {
+  private def createUnevenRow(cell: Cell, width: Int) = {
 
     var currentBottom = Cell(idGenerator.nextID())
-        val first = currentBottom
-        for (i <- 1 to width) {
-          currentBottom.registerNeighborEast(Cell(idGenerator.nextID()))
-          currentBottom = currentBottom.east
-        }
+    val first = currentBottom
+    for (i <- 1 to width) {
+      currentBottom.registerNeighborEast(Cell(idGenerator.nextID()))
+      currentBottom = currentBottom.east
+    }
 
-        currentBottom = first
-        var currentTop = cell
-        while (currentTop.east != null && currentBottom != null) {
-          currentTop.registerNeighborSoutheast(currentBottom)
-          currentTop.east.registerNeighborSouthwest(currentBottom)
-          currentBottom = currentBottom.east
-          currentTop = currentTop.east
-        }
-        currentTop.registerNeighborSoutheast(currentBottom)
+    currentBottom = first
+    var currentTop = cell
+    while (currentTop.east != null && currentBottom != null) {
+      currentTop.registerNeighborSoutheast(currentBottom)
+      currentTop.east.registerNeighborSouthwest(currentBottom)
+      currentBottom = currentBottom.east
+      currentTop = currentTop.east
+    }
+    currentTop.registerNeighborSoutheast(currentBottom)
+    first
   }
 
   /**
@@ -139,7 +158,7 @@ case class WorldMap(val player: Player) {
    * @param width the starting width of the map
    * @param height the starting height of the map
    */
-  def init(width: Int = 5, height: Int = 5) = {
+  private def init(width: Int = 5, height: Int = 5) = {
     // create top row
     var current = seedCell
     for (i <- 1 to width) {
@@ -150,62 +169,79 @@ case class WorldMap(val player: Player) {
     current = seedCell
 
 
-    createUnevenRow(current, width)
-
-    //        for (i<- 1 to height){
-    //          if (i % 2 == 0){
-    //            createEvenRow(current, width)
-    //          }else{
-    //            createUnevenRow(current, width)
-    //          }
-    //        }
-
-
-    //    seedCell.registerNeighborNortheast(Cell(idGenerator.nextID()))
-    //    seedCell.northeast.registerNeighborNortheast(Cell(idGenerator.nextID()))
-    //
-    //    seedCell.registerNeighborNorthwest(Cell(idGenerator.nextID()))
-    //    seedCell.northwest.registerNeighborNorthwest(Cell(idGenerator.nextID()))
-    //
-    //seedCell.registerNeighborSouthwest(Cell(idGenerator.nextID()))
-    //    seedCell.southwest.registerNeighborSouthwest(Cell(idGenerator.nextID()))
-    //
-    //seedCell.registerNeighborSoutheast(Cell(idGenerator.nextID()))
-    //    seedCell.southeast.registerNeighborSoutheast(Cell(idGenerator.nextID()))
-    //    seedCell.registerNeighborEast(Cell(idGenerator.nextID()))
-    //    seedCell.registerNeighborSoutheast(Cell(idGenerator.nextID()))
-    //    seedCell.registerNeighborSouthwest(Cell(idGenerator.nextID()))
-    //    seedCell.registerNeighborWest(Cell(idGenerator.nextID()))
-    //    seedCell.registerNeighborNorthwest(Cell(idGenerator.nextID()))
+    for (i <- 1 to height) {
+      if (i % 2 == 0) {
+        current = createEvenRow(current, width)
+      } else {
+        current = createUnevenRow(current, width)
+      }
+    }
   }
 
 
-  def drawCell(cell: Cell): Unit = {
+  private def drawCell(cell: Cell): Unit = {
     drawCell(cell, 0, 0)
     mark = !mark
   }
 
-  def drawCell(cell: Cell, x: Int, y: Int): Unit = {
+  private def drawCell(cell: Cell, x: Float, y: Float): Unit = {
     if (cell != null && cell.marked != mark) {
-      val width = x * Game.sprites.getSpriteWidth().toFloat
-      val height = y * (Game.sprites.getSpriteHeight()).toFloat
-      Game.sprites.getEmptyCell().draw(width, height)
+      Game.sprites.getEmptyCell().draw(x, y)
       cell.marked = !cell.marked
-      drawDiagonalCell(cell.northeast, x + 1, y - 1)
-      drawCell(cell.east, x + 1, y)
-      drawDiagonalCell(cell.southeast, x + 1, y + 1)
+
+      drawWest(cell.west, x, y)
+      drawEast(cell.east, x, y)
+      drawNortheast(cell.northeast, x, y)
+      drawNorthwest(cell.northwest, x, y)
+      drawSoutheast(cell.southeast, x, y)
+      drawSouthwest(cell.southwest, x, y)
     }
   }
 
-  def drawDiagonalCell(cell: Cell, x: Int, y: Int): Unit = {
-    if (cell != null && cell.marked != mark) {
-      val width = -(Game.sprites.getSpriteWidth()) + (Game.sprites.getSpriteWidth() / 2) + x * (Game.sprites.getSpriteWidth()).toFloat
-      val height = y * (Game.sprites.getSpriteHeight() - 8).toFloat
-      Game.sprites.getEmptyCell().draw(width, height)
-      cell.marked = !cell.marked
-      drawDiagonalCell(cell.northeast, x + 1, y - 1)
-      drawCell(cell.east, x + 1, y)
-      drawDiagonalCell(cell.southeast, x + 1, y + 1)
+
+  private def drawEast(east: Cell, x: Float, y: Float): Unit = {
+    val newX = x + Game.sprites.getSpriteWidth()
+    if (east != null && east.marked != mark) {
+      drawCell(east, newX, y)
+    }
+  }
+
+  private def drawWest(west: Cell, x: Float, y: Float): Unit = {
+    val newX = x - Game.sprites.getSpriteWidth()
+    if (west != null && west.marked != mark) {
+      drawCell(west, newX, y)
+    }
+  }
+
+  private def drawNortheast(northeast: Cell, x: Float, y: Float): Unit = {
+    val newX = x + (Game.sprites.getSpriteWidth() / 2)
+    val newY = y - Game.sprites.getSpriteHeight() + 8
+    if (northeast != null && northeast.marked != mark) {
+      drawCell(northeast, newX, newY)
+    }
+  }
+
+  private def drawSoutheast(southeast: Cell, x: Float, y: Float): Unit = {
+    val newX = x + (Game.sprites.getSpriteWidth() / 2)
+    val newY = y + Game.sprites.getSpriteHeight() - 8
+    if (southeast != null && southeast.marked != mark) {
+      drawCell(southeast, newX, newY)
+    }
+  }
+
+  private def drawNorthwest(northwest: Cell, x: Float, y: Float): Unit = {
+    val newX = x - (Game.sprites.getSpriteWidth() / 2)
+    val newY = y - Game.sprites.getSpriteHeight() + 8
+    if (northwest != null && northwest.marked != mark) {
+      drawCell(northwest, newX, newY)
+    }
+  }
+
+  private def drawSouthwest(southwest: Cell, x: Float, y: Float): Unit = {
+    val newX = x - (Game.sprites.getSpriteWidth() / 2)
+    val newY = y + Game.sprites.getSpriteHeight() - 8
+    if (southwest != null && southwest.marked != mark) {
+      drawCell(southwest, newX, newY)
     }
   }
 
