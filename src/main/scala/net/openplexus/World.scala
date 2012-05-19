@@ -1,6 +1,7 @@
 package net.openplexus
 
 import org.newdawn.slick.Graphics
+import collection.mutable.HashMap
 
 
 /**
@@ -12,10 +13,10 @@ class World(val width: Int, val height: Int) {
   val map = WorldMap(player, width, height)
 
 
-  def movePlayerEast = {
-
+  def moveEast(entity: Entity) = {
+    val newPosition = map.getNeighbourEast(entity)
+    map.setPosition(entity, newPosition)
   }
-
 
 
   def draw(g: Graphics) {
@@ -111,14 +112,86 @@ case class Cell(val id: Int) {
  * @param player the player
  */
 case class WorldMap(val player: Player, var width: Int, var height: Int) {
+
   private val idGenerator = new IDGenerator()
   private val seedCell = Cell(idGenerator.nextID())
+  private val positions = HashMap[Entity, Cell]()
   private var mark = true
 
   init(width, height)
 
 
-  player.setPosition(seedCell.southeast.southeast.southeast.east.east.east)
+  def getNeighbourEast(entity: Entity): Cell = {
+    if (entity == null) throw new IllegalArgumentException("Entity may not be null!")
+
+    val position = positions(entity)
+    if (position == null) {
+      return seedCell
+    } else {
+      return position.east
+    }
+  }
+
+  def getNeighbourWest(entity: Entity): Cell = {
+    if (entity == null) throw new IllegalArgumentException("Entity may not be null!")
+
+    val position = positions(entity)
+    if (position == null) {
+      return seedCell
+    } else {
+      return position.west
+    }
+  }
+
+  def getNeighbourNortheast(entity: Entity): Cell = {
+    if (entity == null) throw new IllegalArgumentException("Entity may not be null!")
+
+    val position = positions(entity)
+    if (position == null) {
+      return seedCell
+    } else {
+      return position.northeast
+    }
+  }
+
+  def getNeighbourNorthwest(entity: Entity): Cell = {
+    if (entity == null) throw new IllegalArgumentException("Entity may not be null!")
+
+    val position = positions(entity)
+    if (position == null) {
+      return seedCell
+    } else {
+      return position.northwest
+    }
+  }
+
+  def getNeighbourSoutheast(entity: Entity): Cell = {
+    if (entity == null) throw new IllegalArgumentException("Entity may not be null!")
+
+    val position = positions(entity)
+    if (position == null) {
+      return seedCell
+    } else {
+      return position.southeast
+    }
+  }
+
+  def getNeighbourSouthwest(entity: Entity): Cell = {
+    if (entity == null) throw new IllegalArgumentException("Entity may not be null!")
+
+    val position = positions(entity)
+    if (position == null) {
+      return seedCell
+    } else {
+      return position.southwest
+    }
+  }
+
+  def setPosition(entity: Entity, position: Cell) = {
+    val oldPosition = positions(entity)
+    positions += entity -> position
+    oldPosition
+  }
 
 
   private def createEvenRow(cell: Cell, width: Int) = {
@@ -187,6 +260,8 @@ case class WorldMap(val player: Player, var width: Int, var height: Int) {
         current = createUnevenRow(current, width)
       }
     }
+
+    positions += player -> seedCell
   }
 
 
