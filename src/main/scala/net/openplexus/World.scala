@@ -11,6 +11,13 @@ class World(val width: Int, val height: Int) {
   val player = Player()
   val map = WorldMap(player, width, height)
 
+
+  def movePlayerEast = {
+
+  }
+
+
+
   def draw(g: Graphics) {
     map.draw(g)
   }
@@ -87,8 +94,12 @@ case class Cell(val id: Int) {
   }
 
 
-  def draw(g: Graphics) = {
-
+  def draw(x: Float, y: Float) = {
+    if (visible) {
+      Game.sprites.getEmptyCell().draw(x, y)
+    } else if (visited) {
+      Game.sprites.getBlockedCell().draw(x, y)
+    }
   }
 
   override def toString = String.valueOf(id)
@@ -107,7 +118,7 @@ case class WorldMap(val player: Player, var width: Int, var height: Int) {
   init(width, height)
 
 
-  player.setPosition(seedCell)
+  player.setPosition(seedCell.southeast.southeast.southeast.east.east.east)
 
 
   private def createEvenRow(cell: Cell, width: Int) = {
@@ -186,7 +197,7 @@ case class WorldMap(val player: Player, var width: Int, var height: Int) {
 
   private def drawCell(cell: Cell, x: Float, y: Float): Unit = {
     if (cell != null && cell.marked != mark) {
-      Game.sprites.getEmptyCell().draw(x, y)
+      cell.draw(x, y)
       cell.marked = !cell.marked
 
       drawWest(cell.west, x, y)

@@ -1,6 +1,7 @@
 package net.openplexus
 
 import org.newdawn.slick.Graphics
+import collection.mutable.Buffer
 
 
 /**
@@ -9,8 +10,9 @@ import org.newdawn.slick.Graphics
  *
  */
 
-case class Player() extends Entity with Movable{
+case class Player() extends Entity with Movable {
   private val sprite = Game.sprites.getPlayerSprite()
+
 
   def draw(g: Graphics, x: Float, y: Float) {
     sprite.draw(x, y)
@@ -20,9 +22,9 @@ case class Player() extends Entity with Movable{
 /**
  * Everything that moves should implement this trait.
  */
-trait Movable{
+trait Movable {
   protected var currentCell: Cell = null
-
+  protected val moveHistory = Buffer[Cell]()
   /**
    * Places the entity to a new Cell of the WorldMap
    * @return the old position on the map
@@ -30,7 +32,6 @@ trait Movable{
   def setPosition(cell: Cell) = {
     val oldCell = currentCell
     currentCell = cell
-    currentCell.visible = true
     currentCell.visited = true
     oldCell
   }
@@ -40,6 +41,6 @@ trait Movable{
 
 }
 
-abstract class Entity{
-  abstract def draw(g: Graphics, x: Float, y: Float)
+abstract class Entity {
+  def draw(g: Graphics, x: Float, y: Float)
 }
