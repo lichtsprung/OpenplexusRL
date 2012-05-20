@@ -2,6 +2,7 @@ package net.openplexus
 
 import org.newdawn.slick.Graphics
 import collection.mutable.HashMap
+import sbt.DirectCredentials
 
 
 /**
@@ -121,71 +122,26 @@ case class WorldMap(val player: Player, var width: Int, var height: Int) {
   init(width, height)
 
 
-  def getNeighbourEast(entity: Entity): Cell = {
+  import Direction._
+  def getNeighbour(entity: Entity, direction: Direction): Cell = {
     if (entity == null) throw new IllegalArgumentException("Entity may not be null!")
 
     val position = positions(entity)
     if (position == null) {
       return seedCell
     } else {
-      return position.east
+      // TODO hier muss der passende Nachbar zurückgegeben werden
+      direction match{
+        case East =>
+        case West =>
+        case Northeast =>
+        case Northwest =>
+        case Southeast =>
+        case Southwest =>
+      }
     }
   }
 
-  def getNeighbourWest(entity: Entity): Cell = {
-    if (entity == null) throw new IllegalArgumentException("Entity may not be null!")
-
-    val position = positions(entity)
-    if (position == null) {
-      return seedCell
-    } else {
-      return position.west
-    }
-  }
-
-  def getNeighbourNortheast(entity: Entity): Cell = {
-    if (entity == null) throw new IllegalArgumentException("Entity may not be null!")
-
-    val position = positions(entity)
-    if (position == null) {
-      return seedCell
-    } else {
-      return position.northeast
-    }
-  }
-
-  def getNeighbourNorthwest(entity: Entity): Cell = {
-    if (entity == null) throw new IllegalArgumentException("Entity may not be null!")
-
-    val position = positions(entity)
-    if (position == null) {
-      return seedCell
-    } else {
-      return position.northwest
-    }
-  }
-
-  def getNeighbourSoutheast(entity: Entity): Cell = {
-    if (entity == null) throw new IllegalArgumentException("Entity may not be null!")
-
-    val position = positions(entity)
-    if (position == null) {
-      return seedCell
-    } else {
-      return position.southeast
-    }
-  }
-
-  def getNeighbourSouthwest(entity: Entity): Cell = {
-    if (entity == null) throw new IllegalArgumentException("Entity may not be null!")
-
-    val position = positions(entity)
-    if (position == null) {
-      return seedCell
-    } else {
-      return position.southwest
-    }
-  }
 
   def setPosition(entity: Entity, position: Cell) = {
     val oldPosition = positions(entity)
@@ -345,8 +301,11 @@ private class IDGenerator {
   }
 
   def lastID() = id
-
 }
 
+object Direction extends Enumeration{
+  type Direction = Value
+  val Northeast, Northwest, Southeast, Southwest, East, West = Value
+}
 
 
