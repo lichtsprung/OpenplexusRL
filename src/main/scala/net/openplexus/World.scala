@@ -1,15 +1,25 @@
 package net.openplexus
 
 import org.newdawn.slick.Graphics
+import collection.mutable.HashMap
+import sbt.DirectCredentials
 
 
 /**
  * World related stuff.
+ * blablablablabla
  */
 
 class World(val width: Int, val height: Int) {
   val player = Player()
   val map = WorldMap(player, width, height)
+
+
+  def moveEast(entity: Entity) = {
+    val newPosition = map.getNeighbourEast(entity)
+    map.setPosition(entity, newPosition)
+  }
+
 
   def draw(g: Graphics) {
     map.draw(g)
@@ -87,8 +97,12 @@ case class Cell(val id: Int) {
   }
 
 
-  def draw(g: Graphics) = {
-
+  def draw(x: Float, y: Float) = {
+    if (visible) {
+      Game.sprites.getEmptyCell().draw(x, y)
+    } else if (visited) {
+      Game.sprites.getBlockedCell().draw(x, y)
+    }
   }
 
   override def toString = String.valueOf(id)
@@ -100,14 +114,41 @@ case class Cell(val id: Int) {
  * @param player the player
  */
 case class WorldMap(val player: Player, var width: Int, var height: Int) {
+
   private val idGenerator = new IDGenerator()
   private val seedCell = Cell(idGenerator.nextID())
+  private val positions = HashMap[Entity, Cell]()
   private var mark = true
 
   init(width, height)
 
 
-  player.setPosition(seedCell)
+  import Direction._
+  def getNeighbour(entity: Entity, direction: Direction): Cell = {
+    if (entity == null) throw new IllegalArgumentException("Entity may not be null!")
+
+    val position = positions(entity)
+    if (position == null) {
+      return seedCell
+    } else {
+      // TODO hier muss der passende Nachbar zurückgegeben werden
+      direction match{
+        case East =>
+        case West =>
+        case Northeast =>
+        case Northwest =>
+        case Southeast =>
+        case Southwest =>
+      }
+    }
+  }
+
+
+  def setPosition(entity: Entity, position: Cell) = {
+    val oldPosition = positions(entity)
+    positions += entity -> position
+    oldPosition
+  }
 
 
   private def createEvenRow(cell: Cell, width: Int) = {
@@ -176,6 +217,8 @@ case class WorldMap(val player: Player, var width: Int, var height: Int) {
         current = createUnevenRow(current, width)
       }
     }
+
+    positions += player -> seedCell
   }
 
 
@@ -186,7 +229,7 @@ case class WorldMap(val player: Player, var width: Int, var height: Int) {
 
   private def drawCell(cell: Cell, x: Float, y: Float): Unit = {
     if (cell != null && cell.marked != mark) {
-      Game.sprites.getEmptyCell().draw(x, y)
+      cell.draw(x, y)
       cell.marked = !cell.marked
 
       drawWest(cell.west, x, y)
@@ -259,8 +302,11 @@ private class IDGenerator {
   }
 
   def lastID() = id
-
 }
 
+object Direction extends Enumeration{
+  type Direction = Value
+  val Northeast, Northwest, Southeast, Southwest, East, West = Value
+}
 
 

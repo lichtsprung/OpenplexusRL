@@ -27,6 +27,10 @@ class Game extends BasicGame("street") {
   }
 
   override def update(gc: GameContainer, delta: Int) {
+    val input = gc.getInput
+    if (input.isKeyPressed(Input.KEY_RIGHT)){
+      world.movePlayerEast
+    }
   }
 
   override def render(gc: GameContainer, g: Graphics) {
@@ -36,3 +40,5 @@ class Game extends BasicGame("street") {
     world.draw(g)
   }
 }
+
+
