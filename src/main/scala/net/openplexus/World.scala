@@ -2,7 +2,6 @@ package net.openplexus
 
 import org.newdawn.slick.Graphics
 import collection.mutable.HashMap
-import sbt.DirectCredentials
 
 
 /**
@@ -16,7 +15,7 @@ class World(val width: Int, val height: Int) {
 
 
   def moveEast(entity: Entity) = {
-    val newPosition = map.getNeighbourEast(entity)
+    val newPosition = map.getNeighbour(entity, Direction.East)
     map.setPosition(entity, newPosition)
   }
 
@@ -40,7 +39,8 @@ case class Cell(val id: Int) {
   var southwest: Cell = null
   var southeast: Cell = null
   var visited: Boolean = false
-  var visible: Boolean = false
+  // TODO needs to be set according to player position
+  var visible: Boolean = true
   var marked: Boolean = false
 
   /**
@@ -131,14 +131,14 @@ case class WorldMap(val player: Player, var width: Int, var height: Int) {
     if (position == null) {
       return seedCell
     } else {
-      // TODO hier muss der passende Nachbar zurückgegeben werden
+
       direction match{
-        case East =>
-        case West =>
-        case Northeast =>
-        case Northwest =>
-        case Southeast =>
-        case Southwest =>
+        case East => position.east
+        case West => position.west
+        case Northeast => position.northeast
+        case Northwest => position.northwest
+        case Southeast => position.southeast
+        case Southwest => position.southwest
       }
     }
   }
@@ -222,6 +222,7 @@ case class WorldMap(val player: Player, var width: Int, var height: Int) {
   }
 
 
+  // Drawing should be in a separate class MapRenderer!
   private def drawCell(cell: Cell): Unit = {
     drawCell(cell, 0, 0)
     mark = !mark
