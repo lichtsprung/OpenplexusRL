@@ -6,7 +6,8 @@ import org.scalatest.FunSuite
  * Testing the Player class.
  */
 
-class PlayerTest extends FunSuite{
+class
+PlayerTest extends FunSuite{
   test("Create a new player"){
   }
 }
