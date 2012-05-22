@@ -8,8 +8,6 @@ import org.scalatest.FunSuite
 
 class WorldMapTest extends FunSuite{
   test("Creating an empty WorldMap and spawn test room"){
-    val worldMap = WorldMap(Player())
-    worldMap.init()
-    worldMap.traversMap()
+
   }
 }
