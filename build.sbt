@@ -12,4 +12,4 @@ seq(releaseSettings: _*)
 
 publishTo := Some("Git Repository" at "https://lichtsprung@github.com/lichtsprung/OpenplexusRL.git")
 
-
+credentials += Credentials(Path.userHome / ".ssh" / "id_rsa")
