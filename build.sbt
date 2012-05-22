@@ -10,6 +10,6 @@ libraryDependencies += "org.scalatest" %% "scalatest" % "1.7.2" % "test"
 
 seq(releaseSettings: _*)
 
-publishTo := Some("Git Repository" at "https://lichtsprung@github.com/lichtsprung/OpenplexusRL.git")
+publishTo := Some("Git Repository" at "https://github.com/lichtsprung/OpenplexusRL")
 
-credentials += Credentials(Path.userHome / ".ssh" / "id_rsa")
+
