@@ -16,7 +16,7 @@ object Game {
   }
 }
 
-class Game extends BasicGame("street") {
+class Game extends BasicGame("OpenplexusRL") {
   var world: World = null
   var sprites: SpriteManager = null
 
@@ -28,8 +28,18 @@ class Game extends BasicGame("street") {
 
   override def update(gc: GameContainer, delta: Int) {
     val input = gc.getInput
-    if (input.isKeyPressed(Input.KEY_RIGHT)){
-      world.moveEast(world.player)
+    if (input.isKeyPressed(Input.KEY_NUMPAD4)) {
+      world.moveEntity(world.player, Direction.West)
+    } else if (input.isKeyPressed(Input.KEY_NUMPAD6)) {
+      world.moveEntity(world.player, Direction.East)
+    } else if (input.isKeyPressed(Input.KEY_NUMPAD7)) {
+      world.moveEntity(world.player, Direction.Northwest)
+    } else if (input.isKeyPressed(Input.KEY_NUMPAD9)) {
+      world.moveEntity(world.player, Direction.Northeast)
+    } else if (input.isKeyPressed(Input.KEY_NUMPAD1)) {
+      world.moveEntity(world.player, Direction.Southwest)
+    } else if (input.isKeyPressed(Input.KEY_NUMPAD3)) {
+      world.moveEntity(world.player, Direction.Southeast)
     }
   }
 

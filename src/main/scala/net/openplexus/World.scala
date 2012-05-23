@@ -1,7 +1,6 @@
 package net.openplexus
 
 import org.newdawn.slick.Graphics
-import collection.mutable.HashMap
 
 
 /**
@@ -14,8 +13,8 @@ class World(val width: Int, val height: Int) {
   val map = WorldMap(player, width, height)
 
 
-  def moveEast(entity: Entity) = {
-    val newPosition = map.getNeighbour(entity, Direction.East)
+  def moveEntity(entity: Entity, direction: Direction.Direction) = {
+    val newPosition = map.getNeighbor(entity, direction)
     map.setPosition(entity, newPosition)
   }
 
@@ -23,7 +22,12 @@ class World(val width: Int, val height: Int) {
   def draw(g: Graphics) {
     map.draw(g)
   }
+}
 
+
+object Direction extends Enumeration {
+  type Direction = Value
+  val Northeast, Northwest, Southeast, Southwest, East, West = Value
 }
 
 

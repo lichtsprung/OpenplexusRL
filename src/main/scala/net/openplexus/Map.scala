@@ -1,17 +1,13 @@
 package net.openplexus
 
 import org.newdawn.slick.Graphics
-import collection.mutable.HashMap
-import Direction._
+import net.openplexus.Direction._
+import collection.mutable.{Buffer, HashMap}
 
 /**
  * Maps and Renderers for the Map.
  */
 
-object Direction extends Enumeration {
-  type Direction = Value
-  val Northeast, Northwest, Southeast, Southwest, East, West = Value
-}
 
 /**
  * A hexagonal cell of the map.
@@ -19,6 +15,7 @@ object Direction extends Enumeration {
  */
 case class Cell(val id: Int) {
   private val neighbors = HashMap[Direction, Cell]()
+  private val entities = Buffer[Entity]()
   var visited: Boolean = false
   // TODO needs to be set according to player position
   var visible: Boolean = true
@@ -49,21 +46,29 @@ case class Cell(val id: Int) {
   }
 
 
-  def neighbor(direction: Direction) = {
-    neighbors(direction)
+  def neighbor(direction: Direction): Cell = {
+    if (neighbors.contains(direction)) {
+      return neighbors(direction)
+    }
+    return null
   }
 
-
-  def draw(x: Float, y: Float) = {
+  def draw(g: Graphics, x: Float, y: Float) = {
     if (visible) {
       Game.sprites.getEmptyCell().draw(x, y)
-    } else if (visited) {
-      Game.sprites.getBlockedCell().draw(x, y)
+      entities.foreach(entity => entity.draw(g, x, y))
     }
   }
 
-  override def toString = String.valueOf(id)
+  def addEntity(entity: Entity) = {
+    entities += entity
+  }
 
+  def removeEntity(entity: Entity) = {
+    entities -= entity
+  }
+
+  override def toString = String.valueOf(id)
 }
 
 /**
@@ -78,11 +83,27 @@ case class WorldMap(val player: Player, var width: Int, var height: Int) {
   private var mark = true
 
   init(width, height)
+  //setPosition(player, seedCell)
 
-  def setPosition(entity: Entity, position: Cell) = {
-    val oldPosition = positions(entity)
-    positions += entity -> position
-    oldPosition
+  def setPosition(entity: Entity, position: Cell): Cell = {
+    if (positions.contains(player)) {
+      val oldPosition = positions(entity)
+      oldPosition.removeEntity(entity)
+      position.addEntity(entity)
+      positions += entity -> position
+      return oldPosition
+    } else {
+      positions += entity -> position
+      return null
+    }
+
+  }
+
+  def getNeighbor(entity: Entity, direction: Direction) = {
+    if (positions(entity).neighbor(direction) == null) {
+      positions(entity).registerNeighbor(Cell(idGenerator.nextID()), direction)
+    }
+    positions(entity).neighbor(direction)
   }
 
 
@@ -101,7 +122,7 @@ case class WorldMap(val player: Player, var width: Int, var height: Int) {
 
     while (currentTop.neighbor(East) != null && currentBottom != null) {
       currentTop.registerNeighbor(currentBottom, Southeast)
-      currentTop.neighbor(East).registerNeighbor(currentBottom,Southwest)
+      currentTop.neighbor(East).registerNeighbor(currentBottom, Southwest)
       currentBottom = currentBottom.neighbor(East)
       currentTop = currentTop.neighbor(East)
     }
@@ -113,19 +134,19 @@ case class WorldMap(val player: Player, var width: Int, var height: Int) {
     var currentBottom = Cell(idGenerator.nextID())
     val first = currentBottom
     for (i <- 1 to width) {
-      currentBottom.registerNeighbor(Cell(idGenerator.nextID()),East)
+      currentBottom.registerNeighbor(Cell(idGenerator.nextID()), East)
       currentBottom = currentBottom.neighbor(East)
     }
 
     currentBottom = first
     var currentTop = cell
     while (currentTop.neighbor(East) != null && currentBottom != null) {
-      currentTop.registerNeighbor(currentBottom,Southeast)
-      currentTop.neighbor(East).registerNeighbor(currentBottom,Southwest)
+      currentTop.registerNeighbor(currentBottom, Southeast)
+      currentTop.neighbor(East).registerNeighbor(currentBottom, Southwest)
       currentBottom = currentBottom.neighbor(East)
       currentTop = currentTop.neighbor(East)
     }
-    currentTop.registerNeighbor(currentBottom,Southeast)
+    currentTop.registerNeighbor(currentBottom, Southeast)
     first
   }
 
@@ -138,7 +159,7 @@ case class WorldMap(val player: Player, var width: Int, var height: Int) {
     // create top row
     var current = seedCell
     for (i <- 1 to width) {
-      current.registerNeighbor(Cell(idGenerator.nextID()),East)
+      current.registerNeighbor(Cell(idGenerator.nextID()), East)
       current = current.neighbor(East)
     }
 
@@ -153,32 +174,32 @@ case class WorldMap(val player: Player, var width: Int, var height: Int) {
       }
     }
 
-    positions += player -> seedCell
+    setPosition(player, seedCell)
   }
 
 
   // Drawing should be in a separate class MapRenderer!
-  private def drawCell(cell: Cell): Unit = {
-    drawCell(cell, 0, 0)
+  private def drawCell(g: Graphics, cell: Cell): Unit = {
+    drawCell(g, cell, 0, 0)
     mark = !mark
   }
 
-  private def drawCell(cell: Cell, x: Float, y: Float): Unit = {
+  private def drawCell(g: Graphics, cell: Cell, x: Float, y: Float): Unit = {
     if (cell != null && cell.marked != mark) {
-      cell.draw(x, y)
+      cell.draw(g, x, y)
       cell.marked = !cell.marked
 
-      draw(cell.west, x, y, West)
-      draw(cell.east, x, y, East)
-      draw(cell.northeast, x, y, Northeast)
-      draw(cell.northwest, x, y, Northwest)
-      draw(cell.southeast, x, y, Southeast)
-      draw(cell.southwest, x, y, Southwest)
+      draw(g, cell.neighbor(West), x, y, West)
+      draw(g, cell.neighbor(East), x, y, East)
+      draw(g, cell.neighbor(Northeast), x, y, Northeast)
+      draw(g, cell.neighbor(Northwest), x, y, Northwest)
+      draw(g, cell.neighbor(Southeast), x, y, Southeast)
+      draw(g, cell.neighbor(Southwest), x, y, Southwest)
     }
   }
 
 
-  def draw(cell: Cell, x: Float, y: Float, direction: Direction) = {
+  def draw(g: Graphics, cell: Cell, x: Float, y: Float, direction: Direction) = {
     var newX = 0.0f
     var newY = 0.0f
     direction match {
@@ -203,12 +224,12 @@ case class WorldMap(val player: Player, var width: Int, var height: Int) {
     }
 
     if (cell != null && cell.marked != mark) {
-      drawCell(cell, newX, newY)
+      drawCell(g, cell, newX, newY)
     }
   }
 
   def draw(g: Graphics) = {
-    drawCell(seedCell)
+    drawCell(g, seedCell)
   }
 }
 
@@ -222,5 +243,3 @@ private class IDGenerator {
 
   def lastID() = id
 }
-
-
