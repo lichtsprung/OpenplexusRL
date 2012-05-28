@@ -22,7 +22,7 @@ class Game extends BasicGame("OpenplexusRL") {
 
   override def init(gc: GameContainer) {
     sprites = new SpriteManager()
-    world = new World(gc.getWidth / sprites.getSpriteWidth(), gc.getHeight / sprites.getSpriteHeight())
+    world = new World(gc.getWidth / sprites.getSpriteWidth(), gc.getHeight / (sprites.getSpriteHeight()/2))
     println("Initialized Game")
   }
 
