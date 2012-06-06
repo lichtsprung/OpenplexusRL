@@ -1,0 +1,15 @@
+<configuration>
+    <general>
+        <resolution width = "800" height = "600"/>
+        <framerate>60</framerate>
+    </general>
+
+    <sprites width = "32" height = "32" file = "graphics.png">
+        <sprite name = "player" indexX = "0" indexY = "0" />
+        <sprite name = "cell_nothing" indexX = "1" indexY = "0" />
+        <sprite name = "cell_grass" indexX = "0" indexY = "1" />
+        <sprite name = "cell_sand" indexX = "1" indexY = "1" />
+        <sprite name = "cell_water" indexX = "2" indexY = "1" />
+        <sprite name = "cell_forrest" indexX = "3" indexY = "1" />
+    </sprites>
+</configuration>

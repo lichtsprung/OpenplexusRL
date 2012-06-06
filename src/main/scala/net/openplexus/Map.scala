@@ -14,12 +14,11 @@ import collection.mutable.{Buffer, HashMap}
  * @param id the id of this cell
  */
 case class Cell(val id: Int, var x: Float = 0.0f, var y: Float = 0.0f) {
-  private val neighbors = HashMap[Direction, Cell]()
+  val neighbors = HashMap[Direction, Cell]()
   private val entities = Buffer[Entity]()
   var visited: Boolean = false
   // TODO needs to be set according to player position
-  var visible: Boolean = true
-  var marked: Boolean = false
+  var visible: Boolean = false
 
 
   def registerNeighbor(neighbor: Cell, x: Float, y: Float, direction: Direction) = {
@@ -29,47 +28,36 @@ case class Cell(val id: Int, var x: Float = 0.0f, var y: Float = 0.0f) {
       case East =>
         newX = x + Game.sprites.getSpriteWidth()
         newY = y
-        neighbor.x = newX
-        neighbor.y = newY
         neighbors += East -> neighbor
         neighbor.neighbors += West -> this
       case West =>
         newX = x - Game.sprites.getSpriteWidth()
         newY = y
-        neighbor.x = newX
-        neighbor.y = newY
         neighbors += West -> neighbor
         neighbor.neighbors += East -> this
       case Northeast =>
         newX = x + (Game.sprites.getSpriteWidth() / 2)
         newY = y - Game.sprites.getSpriteHeight() + 8
-        neighbor.x = newX
-        neighbor.y = newY
         neighbors += Northeast -> neighbor
         neighbor.neighbors += Southwest -> this
       case Northwest =>
         newX = x - (Game.sprites.getSpriteWidth() / 2)
         newY = y - Game.sprites.getSpriteHeight() + 8
-        neighbor.x = newX
-        neighbor.y = newY
         neighbors += Northwest -> neighbor
         neighbor.neighbors += Southeast -> this
       case Southeast =>
         newX = x + (Game.sprites.getSpriteWidth() / 2)
         newY = y + Game.sprites.getSpriteHeight() - 8
-        neighbor.x = newX
-        neighbor.y = newY
         neighbors += Southeast -> neighbor
         neighbor.neighbors += Northwest -> this
       case Southwest =>
         newX = x - (Game.sprites.getSpriteWidth() / 2)
         newY = y + Game.sprites.getSpriteHeight() - 8
-        neighbor.x = newX
-        neighbor.y = newY
         neighbors += Southwest -> neighbor
         neighbor.neighbors += Northeast -> this
     }
-    println("new neighbor at (" + newX + ", " + newY + ")")
+    neighbor.x = newX
+    neighbor.y = newY
   }
 
 
@@ -106,13 +94,11 @@ case class WorldMap(val player: Player, var width: Int, var height: Int) {
 
   private val idGenerator = new IDGenerator()
   private val positions = HashMap[Entity, Cell]()
-  private val cells = Buffer[Cell]()
+  val cells = Buffer[Cell]()
   private val seedCell = createCell
   private var mark = true
 
-  init(5, 1)
-
-  //setPosition(player, seedCell)
+  init(25, 25)
 
   def setPosition(entity: Entity, position: Cell): Cell = {
     if (positions.contains(player)) {
@@ -136,39 +122,33 @@ case class WorldMap(val player: Player, var width: Int, var height: Int) {
     positions(entity).neighbor(direction)
   }
 
+  private def createSouthwestNeighborRow(cell: Cell) = {
+    var bottom = createCell
+    var top = cell
+    val first = bottom
 
-  // TODO muss noch wie createunevenrow angepasst werden
-  private def createEvenRow(cell: Cell, width: Int) = {
-    var currentBottom = createCell
-    val first = currentBottom
-    for (i <- 1 to width) {
-      currentBottom.registerNeighbor(createCell, currentBottom.x, currentBottom.y, East)
-      currentBottom = currentBottom.neighbor(East)
+    while (top.neighbor(East) != null) {
+      top.registerNeighbor(bottom, top.x, top.y, Southwest)
+      val bottomEast = createCell
+      bottom.registerNeighbor(bottomEast, bottom.x, bottom.y, East)
+      bottom = bottom.neighbor(East)
+      top.registerNeighbor(bottomEast, top.x, top.y, Southeast)
+      top = top.neighbor(East)
     }
+    top.registerNeighbor(bottom, top.x, top.y, Southwest)
 
-    currentBottom = first
-    var currentTop = cell
-    currentTop.registerNeighbor(currentBottom, currentBottom.x, currentBottom.y, Southwest)
-    currentBottom = currentBottom.neighbor(East)
-
-    while (currentTop.neighbor(East) != null && currentBottom != null) {
-      currentTop.registerNeighbor(currentBottom, currentBottom.x, currentBottom.y, Southeast)
-      currentTop.neighbor(East).registerNeighbor(currentBottom, currentBottom.x, currentBottom.y, Southwest)
-      currentBottom = currentBottom.neighbor(East)
-      currentTop = currentTop.neighbor(East)
-    }
     first
   }
 
-  private def createUnevenRow(cell: Cell, width: Int) = {
+  private def createSoutheastNeighborRow(cell: Cell) = {
 
     var currentBottom = createCell
     var currentTop = cell
     val first = currentBottom
 
-    while(currentTop.neighbor(East) != null){
+    while (currentTop.neighbor(East) != null) {
       currentTop.registerNeighbor(currentBottom, currentTop.x, currentTop.y, Southeast)
-      currentTop.neighbor(East).registerNeighbor(currentBottom, currentTop.neighbor(East).x,currentTop.neighbor(East).y, Southwest)
+      currentTop.neighbor(East).registerNeighbor(currentBottom, currentTop.neighbor(East).x, currentTop.neighbor(East).y, Southwest)
       val newCell = createCell
       currentBottom.registerNeighbor(newCell, currentBottom.x, currentBottom.y, East)
       currentBottom = currentBottom.neighbor(East)
@@ -186,7 +166,7 @@ case class WorldMap(val player: Player, var width: Int, var height: Int) {
   private def init(width: Int = 5, height: Int = 5) = {
     // create top row
     var current = seedCell
-    for (i <- 1 to width) {
+    for (i <- 2 to width) {
       current.registerNeighbor(createCell, current.x, current.y, East)
       current = current.neighbor(East)
     }
@@ -194,13 +174,11 @@ case class WorldMap(val player: Player, var width: Int, var height: Int) {
     current = seedCell
 
 
-    for (i <- 1 to height) {
+    for (i <- 2 to height) {
       if (i % 2 == 0) {
-        println("even start: (" + current.x + ", "+ current.y + ")")
-        current = createEvenRow(current, width)
+        current = createSoutheastNeighborRow(current)
       } else {
-        println("uneven start: (" + current.x + ", "+ current.y + ")")
-        current = createUnevenRow(current, width)
+        current = createSouthwestNeighborRow(current)
       }
     }
 

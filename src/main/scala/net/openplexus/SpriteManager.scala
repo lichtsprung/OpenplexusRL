@@ -21,4 +21,12 @@ class SpriteManager {
   def getEmptyCell(): Image = sprites.getSprite(1, 0)
 
   def getBlockedCell(): Image = sprites.getSprite(2, 0)
+
+  def getGrassCell(): Image = sprites.getSprite(0, 1)
+
+  def getSandCell(): Image = sprites.getSprite(1, 1)
+
+  def getWaterCell(): Image = sprites.getSprite(2, 1)
+
+  def getForrestCell(): Image = sprites.getSprite(3, 1)
 }

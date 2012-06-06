@@ -22,7 +22,7 @@ class Game extends BasicGame("OpenplexusRL") {
 
   override def init(gc: GameContainer) {
     sprites = new SpriteManager()
-    world = new World(gc.getWidth / sprites.getSpriteWidth(), gc.getHeight / (sprites.getSpriteHeight()/2))
+    world = new World(gc.getWidth / sprites.getSpriteWidth(), gc.getHeight / (sprites.getSpriteHeight() / 2))
     println("Initialized Game")
   }
 
@@ -41,6 +41,7 @@ class Game extends BasicGame("OpenplexusRL") {
     } else if (input.isKeyPressed(Input.KEY_NUMPAD3)) {
       world.moveEntity(world.player, Direction.Southeast)
     }
+    world.update()
   }
 
   override def render(gc: GameContainer, g: Graphics) {
