@@ -19,6 +19,7 @@ object Game {
 class Game extends BasicGame("OpenplexusRL") {
   var world: World = null
   var sprites: SpriteManager = null
+  var start = false
 
   override def init(gc: GameContainer) {
     sprites = new SpriteManager()
@@ -40,8 +41,12 @@ class Game extends BasicGame("OpenplexusRL") {
       world.moveEntity(world.player, Direction.Southwest)
     } else if (input.isKeyPressed(Input.KEY_NUMPAD3)) {
       world.moveEntity(world.player, Direction.Southeast)
+    }else if (input.isKeyPressed(Input.KEY_ENTER)){
+      start = true
     }
-    world.update()
+    if (start){
+      world.update()
+    }
   }
 
   override def render(gc: GameContainer, g: Graphics) {

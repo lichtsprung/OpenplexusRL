@@ -1,6 +1,7 @@
 package net.openplexus
 
 import org.newdawn.slick.{Image, SpriteSheet}
+import GroundType._
 
 
 /**
@@ -18,15 +19,18 @@ class SpriteManager {
 
   def getSpriteWidth(): Int = width
 
-  def getEmptyCell(): Image = sprites.getSprite(1, 0)
-
-  def getBlockedCell(): Image = sprites.getSprite(2, 0)
-
-  def getGrassCell(): Image = sprites.getSprite(0, 1)
-
-  def getSandCell(): Image = sprites.getSprite(1, 1)
-
-  def getWaterCell(): Image = sprites.getSprite(2, 1)
-
-  def getForrestCell(): Image = sprites.getSprite(3, 1)
+  def groundSprite(groundType: GroundType): Image = {
+    groundType match {
+      case Nothing =>
+        sprites.getSprite(1, 0)
+      case Grass =>
+        sprites.getSprite(0, 1)
+      case Water =>
+        sprites.getSprite(2, 1)
+      case Forrest =>
+        sprites.getSprite(3, 1)
+      case Sand =>
+        sprites.getSprite(1, 1)
+    }
+  }
 }

@@ -18,7 +18,11 @@ case class Cell(val id: Int, var x: Float = 0.0f, var y: Float = 0.0f) {
   private val entities = Buffer[Entity]()
   var visited: Boolean = false
   // TODO needs to be set according to player position
-  var visible: Boolean = false
+  var visible: Boolean = true
+
+  import GroundType._
+
+  var cellType: GroundType = Grass
 
 
   def registerNeighbor(neighbor: Cell, x: Float, y: Float, direction: Direction) = {
@@ -70,7 +74,7 @@ case class Cell(val id: Int, var x: Float = 0.0f, var y: Float = 0.0f) {
 
   def draw(g: Graphics) = {
     if (visible) {
-      Game.sprites.getEmptyCell().draw(x, y)
+      Game.sprites.groundSprite(cellType).draw(x, y)
       entities.foreach(entity => entity.draw(g, x, y))
     }
   }

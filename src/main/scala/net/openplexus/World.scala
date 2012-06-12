@@ -37,7 +37,7 @@ object Direction extends Enumeration {
 
 object GroundType extends Enumeration{
   type GroundType = Value
-  val Nothing, Grass, Forrest, Water, Street = Value
+  val Nothing, Grass, Forrest, Water, Sand = Value
 }
 
 
