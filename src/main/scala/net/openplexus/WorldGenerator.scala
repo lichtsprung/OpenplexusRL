@@ -12,7 +12,7 @@ class WorldGenerator(val map: WorldMap) {
   private val updateInterval = 30
   init()
 
-  def init() = {
+  def init() {
     val unused = Buffer[Cell]()
 
     map.cells.foreach(cell => {
@@ -44,7 +44,7 @@ class WorldGenerator(val map: WorldMap) {
   }
 
 
-  def update() = {
+  def update()  {
     if (counter == 0) {
       map.cells.foreach(cell => {
         val sandCount = getNeighborCount(cell, Sand)
