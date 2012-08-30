@@ -1,7 +1,6 @@
 package net.openplexus
 
 import org.newdawn.slick.Graphics
-import collection.mutable.Buffer
 
 
 /**
@@ -11,11 +10,15 @@ import collection.mutable.Buffer
  */
 
 case class Player() extends Entity {
-  private val sprite = Game.sprites.getPlayerSprite()
-
+  private val sprite = Game.sprites.getPlayerSprite
+  private var hunger = 0.0
 
   def draw(g: Graphics, x: Float, y: Float) {
     sprite.draw(x, y)
+  }
+
+  def update(){
+    hunger += 0.01
   }
 }
 
@@ -25,4 +28,5 @@ case class Player() extends Entity {
 
 abstract class Entity {
   def draw(g: Graphics, x: Float, y: Float)
+  def update()
 }

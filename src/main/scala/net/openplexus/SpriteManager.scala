@@ -13,11 +13,11 @@ class SpriteManager {
   private val height = sprites.getHeight / sprites.getVerticalCount
   private val width = sprites.getWidth / sprites.getHorizontalCount
 
-  def getPlayerSprite(): Image = sprites.getSprite(0, 0)
+  def getPlayerSprite: Image = sprites.getSprite(0, 0)
 
-  def getSpriteHeight(): Int = height
+  def getSpriteHeight: Int = height
 
-  def getSpriteWidth(): Int = width
+  def getSpriteWidth: Int = width
 
   def groundSprite(groundType: GroundType): Image = {
     groundType match {

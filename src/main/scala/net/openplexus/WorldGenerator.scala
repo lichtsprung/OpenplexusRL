@@ -19,7 +19,6 @@ class WorldGenerator(val map: WorldMap) {
       if (Random.nextDouble() < 0.2) {
         cell.cellType = Forrest
       } else {
-        println("adding: " + cell)
         unused += cell
       }
     })
